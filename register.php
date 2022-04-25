@@ -1,38 +1,67 @@
 <?php
-    include "config.php";
+include "config.php";
 
-    if(isset($_POST['submit']))
-    {
-        $name = htmlspecialchars($_POST['name']);
-        $email = htmlspecialchars($_POST['email']);
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $checkpassword = password_hash($_POST['checkpassword'], PASSWORD_DEFAULT);
-        $user_type = $_POST['user_type'];
+session_start();
+
+try 
+{
+    
+
+    $stmt = $conn->prepare(
+        "INSERT INTO role_bdd (name, email, password, user_type) VALUES (:name, :email, :password, :user_type)");
+        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':user_type', $user_type);
+
+        $name = htmlspecialchars($_POST["name"]);
+        $email = htmlspecialchars($_POST["email"]);
+        $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
+        $user_type = $_POST["user_type"];
+
+        $stmt->execute();
+        echo "Nouvelle entrée créée dans la table";
+}
+catch(PDOException $e)
+{
+    echo "Erreur: " . $e->getMessage();
+}
+    $conn = null;
+
+    // if(isset($_POST['submit']))
+    // {
+    //     $name = htmlspecialchars($_POST['name']);
+    //     $email = htmlspecialchars($_POST['email']);
+    //     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    //     $checkpassword = password_hash($_POST['checkpassword'], PASSWORD_DEFAULT);
+    //     $user_type = $_POST['user_type'];
      
-        $sql = " SELECT * FROM user_form WHERE email = $email AND password = $password ";
+    //     $sql = " SELECT * FROM user_form WHERE email = $email AND password = $password ";
 
-        $query = $conn->prepare($sql);
-        $query->execute();
+    //     $query = $conn->prepare($sql);
+        
 
-        if(rowCount($query) > 0)
-        {
-            $_SESSION['erreur'] = "User already exist !";
-        }
-        else 
-        {
-            if($password !== $checkpassword)
-            {
-                $_SESSION['erreur'] = "Password not matched !";
-            }
-            else 
-            {
-                $insert = " INSERT INTO user_form (name, email, password, user_type) VALUES ($name, $email, $password, $user_type) ";
-                $query = $conn->prepare($insert);
-                $query->execute();
-                header('Location: login.php');
-            }
-        }
-    }
+    //     if(rowCount($query) > 0)
+    //     {
+    //         $_SESSION['erreur'] = "User already exist !";
+    //     }
+    //     else 
+    //     {
+    //         if($password !== $checkpassword)
+    //         {
+    //             $_SESSION['erreur'] = "Password not matched !";
+    //         }
+    //         else 
+    //         {
+    //             $insert = " INSERT INTO user_form (name, email, password, user_type) VALUES ($name, $email, $password, $user_type) ";
+    //             $query = $conn->prepare($insert);
+    //             $query->execute();
+    //             header('Location: login.php');
+    //         }
+    //     }
+
+    //     $query->execute();
+    // }
 ?>
 
 <!DOCTYPE html>
